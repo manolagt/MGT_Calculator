@@ -1,72 +1,67 @@
 name: Build MGT Calculator APK
 
 on:
-  workflow_dispatch:
-  push:
-    branches:
-      - main
+workflow_dispatch:
+push:
+branches:
+- main
 
 jobs:
-  build:
-    runs-on: ubuntu-22.04
-    timeout-minutes: 90
+build:
+runs-on: ubuntu-22.04
+timeout-minutes: 90
 
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+steps:
+  - name: Checkout
+    uses: actions/checkout@v4
 
-      - name: Install system dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y \
-            git zip unzip openjdk-17-jdk \
-            python3-pip python3-venv \
-            autoconf libtool pkg-config \
-            zlib1g-dev libncurses5-dev \
-            libffi-dev libssl-dev cmake
+  - name: Install system dependencies
+    run: |
+      sudo apt-get update
+      sudo apt-get install -y git zip unzip openjdk-17-jdk python3-pip python3-venv autoconf libtool pkg-config zlib1g-dev libncurses5-dev libffi-dev libssl-dev cmake
 
-      - name: Setup Python
-        run: |
-          python3 -m venv .venv
-          .venv/bin/pip install --upgrade pip
-          .venv/bin/pip install buildozer Cython==0.29.36
+  - name: Setup Python
+    run: |
+      python3 -m venv .venv
+      .venv/bin/pip install --upgrade pip
+      .venv/bin/pip install buildozer Cython==0.29.36
 
-      - name: Create Buildozer config
-        run: |
-          cat > buildozer.spec <<'EOF'
-          [app]
-          title = MGT Calculator
-          package.name = mgtcalculator
-          package.domain = org.mgtcalculator
-          source.dir = .
-          source.include_exts = py,wav,png,jpg,kv,atlas
-          version = 1.0
-          requirements = python3,kivy
-          orientation = portrait
-          fullscreen = 0
-          android.api = 33
-          android.minapi = 21
-          android.archs = arm64-v8a
-          android.accept_sdk_license = True
+  - name: Create Buildozer config
+    run: |
+      cat > buildozer.spec <<'EOF'
+      [app]
+      title = MGT Calculator
+      package.name = mgtcalculator
+      package.domain = org.mgtcalculator
+      source.dir = .
+      source.include_exts = py,wav,png,jpg,kv,atlas
+      version = 1.0
+      requirements = python3,kivy
+      orientation = portrait
+      fullscreen = 0
+      android.api = 33
+      android.minapi = 21
+      android.archs = arm64-v8a
+      android.accept_sdk_license = True
 
-          [buildozer]
-          log_level = 2
-          warn_on_root = 0
-          EOF
+      [buildozer]
+      log_level = 2
+      warn_on_root = 0
+      EOF
 
-      - name: Check main.py
-        run: |
-          test -f main.py
-          python3 -m py_compile main.py
+  - name: Check main.py
+    run: |
+      test -f main.py
+      python3 -m py_compile main.py
 
-            - name: Build APK
-        run: |
-          export PATH="$PWD/.venv/bin:$PATH"
-          .venv/bin/buildozer android debug
+  - name: Build APK
+    run: |
+      export PATH="$PWD/.venv/bin:$PATH"
+      .venv/bin/buildozer android debug
 
-      - name: Upload APK
-        uses: actions/upload-artifact@v4
-        with:
-          name: MGT-Calculator-APK
-          path: bin/*.apk
-          if-no-files-found: error
+  - name: Upload APK
+    uses: actions/upload-artifact@v4
+    with:
+      name: MGT-Calculator-APK
+      path: bin/*.apk
+      if-no-files-found: error
