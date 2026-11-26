@@ -59,8 +59,9 @@ jobs:
           test -f main.py
           python3 -m py_compile main.py
 
-      - name: Build APK
+            - name: Build APK
         run: |
+          export PATH="$PWD/.venv/bin:$PATH"
           .venv/bin/buildozer android debug
 
       - name: Upload APK
