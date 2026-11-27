@@ -22,9 +22,9 @@ jobs:
 
       - name: Setup Python
         run: |
-          python3 -m venv .venv
-          .venv/bin/pip install --upgrade pip
-          .venv/bin/pip install buildozer Cython==0.29.36
+          python3 -m pip install --user --break-system-packages --upgrade pip
+          python3 -m pip install --user --break-system-packages buildozer Cython==0.29.36
+          echo "$HOME/.local/bin" >> $GITHUB_PATH
 
       - name: Create Buildozer config
         run: |
@@ -56,8 +56,8 @@ jobs:
 
       - name: Build APK
         run: |
-          export PATH="$PWD/.venv/bin:$PATH"
-          .venv/bin/buildozer android debug
+          buildozer android debug
+        
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
